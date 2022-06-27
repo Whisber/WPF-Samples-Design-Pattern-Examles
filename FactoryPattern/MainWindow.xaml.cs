@@ -63,11 +63,10 @@ namespace TextFormatting
                    System.Windows.Media.Brushes.Black,
                    new Typeface("Arial"));
             }
-            
+
             _UILoaded = true;    //All UI is loaded, can handle events now
             UpdateFormattedText(_pixelsPerDip);
         }
-
         /// <summary>
         /// Method for starting the text formatting process. Each event handler
         /// will call this after the current fontrendering is updated.
@@ -172,9 +171,121 @@ namespace TextFormatting
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        /// 
+        //////////////////////////////////////////////////////////////BURDAN BASLIYOR FACTORY PATTERN////////////////////////////////////////////
+        public interface Itouch
+        {
+            void click();
+        }
+        public class boldClick : MainWindow, Itouch
+        {
+            private ToggleButton sender;
+            public void click()
+            {
+                if (!_UILoaded)
+                    return;
+                ToggleButton toggle = sender as ToggleButton;
+                Typeface oldFace = _currentRendering.Typeface;
+                Typeface newFace;
+
+                if (toggle.IsChecked == true)
+                {
+                    newFace = new Typeface(oldFace.FontFamily,
+                       oldFace.Style, FontWeights.Bold, oldFace.Stretch);
+                }
+                else
+                {
+                    newFace = new Typeface(oldFace.FontFamily,
+                       oldFace.Style, FontWeights.Normal, oldFace.Stretch);
+                }
+                _currentRendering.Typeface = newFace;
+                UpdateFormattedText(_pixelsPerDip);
+            }
+        }
+        public class italicClick : MainWindow, Itouch
+        {
+            private ToggleButton sender;
+
+            public void click()
+            {
+                if (!_UILoaded)
+                    return;
+
+                ToggleButton toggle = sender as ToggleButton;
+
+                Typeface oldFace = _currentRendering.Typeface;
+                Typeface newFace;
+
+                if (toggle.IsChecked == true)
+                {
+                    newFace = new Typeface(oldFace.FontFamily,
+                       FontStyles.Italic, oldFace.Weight, oldFace.Stretch);
+                }
+                else
+                {
+                    newFace = new Typeface(oldFace.FontFamily,
+                       FontStyles.Normal, oldFace.Weight, oldFace.Stretch);
+                }
+                _currentRendering.Typeface = newFace;
+                UpdateFormattedText(_pixelsPerDip);
+            }
+        }
+        public class decorationClick : MainWindow, Itouch
+        {
+            public void click()
+            {
+                if (!_UILoaded)
+                    return;
+
+                TextDecorationCollection tds = new TextDecorationCollection();
+
+                if (underlineButton.IsChecked == true)
+                {
+                    TextDecoration underline = new TextDecoration();
+                    underline.Location = TextDecorationLocation.Underline;
+                    underline.Pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Blue, 1);
+                    underline.PenThicknessUnit = TextDecorationUnit.FontRecommended;
+                    tds.Add(underline);
+                }
+                if (strikeButton.IsChecked == true)
+                {
+                    TextDecoration strikethrough = new TextDecoration();
+                    strikethrough.Location = TextDecorationLocation.Strikethrough;
+                    strikethrough.Pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 1);
+                    strikethrough.PenThicknessUnit = TextDecorationUnit.FontRecommended;
+                    tds.Add(strikethrough);
+                }
+                _currentRendering.TextDecorations = tds;
+                UpdateFormattedText(_pixelsPerDip);
+            }
+        }
+        public class clickFactory : MainWindow    /// olaylar burada kontrol ediliyor.
+        {
+            public Itouch getClick(string clickType)
+            {
+                if (clickType == null)
+                {
+                    return null;
+                }
+                if (clickType.Equals("Bold"))
+                {
+                    return new boldClick();
+                }
+                else if (clickType.Equals("Italic"))
+                {
+                    return new italicClick();
+
+                }
+                else if (clickType.Equals("Decoration"))
+                {
+                    return new decorationClick();
+                }
+                return null;
+            }
+        }
         private void BoldClickedEventHandler(object sender, RoutedEventArgs e)
         {
-            // Make sure All UI is loaded
+            /* Make sure All UI is loaded
             if (!_UILoaded)
                 return;
 
@@ -194,7 +305,12 @@ namespace TextFormatting
                    oldFace.Style, FontWeights.Normal, oldFace.Stretch);
             }
             _currentRendering.Typeface = newFace;
-            UpdateFormattedText(_pixelsPerDip);
+            UpdateFormattedText(_pixelsPerDip); */
+            MessageBox.Show("Bu butona Factory uygulandı"); //UYGULUYORUZ BURDA
+            clickFactory ck = new clickFactory();
+            Itouch boldCk = ck.getClick("Bold");
+            boldCk.click();
+
         }
 
         /// <summary>
@@ -204,7 +320,7 @@ namespace TextFormatting
         /// <param name="e"></param>
         private void ItalicClickEventHandler(object sender, RoutedEventArgs e)
         {
-            // Make sure All UI is loaded
+            /* Make sure All UI is loaded
             if (!_UILoaded)
                 return;
 
@@ -224,7 +340,13 @@ namespace TextFormatting
                    FontStyles.Normal, oldFace.Weight, oldFace.Stretch);
             }
             _currentRendering.Typeface = newFace;
-            UpdateFormattedText(_pixelsPerDip);
+            UpdateFormattedText(_pixelsPerDip); */
+
+
+            MessageBox.Show("Bu butona Factory uygulandı");
+            clickFactory ck = new clickFactory();
+            Itouch italicCk = ck.getClick("Italic");
+            italicCk.click();
         }
 
         /// <summary>
@@ -234,7 +356,7 @@ namespace TextFormatting
         /// <param name="e"></param>
         private void DecorationClickEventHandler(object sender, RoutedEventArgs e)
         {
-            // Make sure All UI is loaded
+            /* Make sure All UI is loaded
             if (!_UILoaded)
                 return;
 
@@ -257,7 +379,11 @@ namespace TextFormatting
                 tds.Add(strikethrough);
             }
             _currentRendering.TextDecorations = tds;
-            UpdateFormattedText(_pixelsPerDip);
+            UpdateFormattedText(_pixelsPerDip); */
+            MessageBox.Show("Bu butona Factory uygulandı");
+            clickFactory ck = new clickFactory();
+            Itouch decorationCk = ck.getClick("Decoration");
+            decorationCk.click();
         }
 
         /// <summary>
